@@ -134,10 +134,10 @@
   (error "Não implementada"))
 
 (define in (open-input-file "../testes/b"))
-(read-line in)
-(define linha (read-line in))
-(define  arrL (string-split	linha " "))
-(define hr (first (rest arrL)))
+;(read-line in)
+;(define linha (read-line in))
+;(define  arrL (string-split	linha " "))
+;(define hr (first (rest arrL)))
 
 
 (define (string-convertida-em-horario s)
@@ -175,9 +175,10 @@
 )
 
 
-(define (string-convertido-em-lista ponteiro)
-  ())
+(define (arquivo-convertido-em-lista ponteiro linha)
+  (cond
+    [(eof-object? linha) empty]
+    [else (cons (dia-convertido-em-lista (string-split linha " ")) (arquivo-convertido-em-lista ponteiro (read-line ponteiro)))]))
 
-(define (arquivo-convertido-em-lista ponteiro)
-  (string-convertida-em-lista (read-line in)))
-;(dia-convertido-em-lista arrL)
+(define linha (read-line in))
+(arquivo-convertido-em-lista in linha)
