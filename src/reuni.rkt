@@ -127,5 +127,57 @@
 ;; A saída desta função é a escrita na tela dos intervalos em comum que
 ;; foram encontrados. O formato da saída deve ser o mesmo da disponibilidade
 ;; semanal.
+
+
+
 (define (main args)
-  (error "Não implementado"))
+  (error "Não implementada"))
+
+(define in (open-input-file "../testes/b"))
+(read-line in)
+(define linha (read-line in))
+(define  arrL (string-split	linha " "))
+(define hr (first (rest arrL)))
+
+
+(define (string-convertida-em-horario s)
+  (cond
+    [(= 1 (length (string-split s ":"))) #f]
+    [else
+     (horario
+      (string->number
+       (first (string-split s ":"))
+      )
+      (string->number
+       (first
+        (rest (string-split s ":"))
+       )
+      )
+     )
+    ]
+  )
+)
+
+
+(define (string-convertida-em-intervalo s)
+  
+  (intervalo (string-convertida-em-horario (first (string-split s "-")))
+                                                     (string-convertida-em-horario (first (rest (string-split s "-"))))
+                                           ))
+
+
+(define (dia-convertido-em-lista dia)
+  (cond
+    [(empty? dia) empty]
+    [(= 3 (string-length (first dia))) (cons (first dia) (dia-convertido-em-lista (rest dia)))]
+    [else (cons (string-convertida-em-intervalo (first dia)) (dia-convertido-em-lista (rest dia)))]
+  )
+)
+
+
+(define (string-convertido-em-lista ponteiro)
+  ())
+
+(define (arquivo-convertido-em-lista ponteiro)
+  (string-convertida-em-lista (read-line in)))
+;(dia-convertido-em-lista arrL)
