@@ -1,0 +1,175 @@
+;; Lista de Exercicios 02
+
+#lang racket
+
+(require rackunit)
+(require rackunit/text-ui)
+
+;; Exercicio 02
+;; Numero -> Boolean
+;; Funcao responsavel por definir a resposta da Expressao Matematica definida no Exercicio 2 para retorno.
+;; Retorna -37/150, que e o resultado da Expressao.
+(define (exercicio_02)
+  (/
+   (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
+   (* 3 (- 6 2) (- 2 7))
+   ))
+
+;; Funcao responsavel por definir testes para a funcao exercicio_02?.
+(define exercicio_02?-tests
+   (test-suite "exercicio_02? tests"
+       (check-equal? (exercicio_02) (- (/ 37 150)))))
+
+;; Exercicio 04
+;; Numero, Numero -> Numero
+;; Funcao responsavel por retornar a soma de um Numero com o Valor Absoluto de outro.
+;; Exemplos:
+;;     (a-plus-abs-b 0 0)   -> 0
+;;     (a-plus-abs-b 0 2)   -> 2
+;;     (a-plus-abs-b 3 0)   -> 3
+;;     (a-plus-abs-b -4 3)  -> -1
+;;     (a-plus-abs-b 2 -3)  -> 5
+;;     (a-plus-abs-b -7 -7) -> 0
+;;     (a-plus-abs-b -9 9)  -> 0
+;;     (a-plus-abs-b 8 -1)  -> 9
+(define (a-plus-abs-b a b)
+  ((if (> b 0) + -) a b))
+
+;; Funcao responsavel por definir testes para a funcao a-plus-abs-b.
+(define a-plus-abs-b-tests
+   (test-suite "a-plus-abs-b tests"
+       (check-equal? (a-plus-abs-b 0 0)   0)
+       (check-equal? (a-plus-abs-b 0 2)   2)
+       (check-equal? (a-plus-abs-b 3 0)   3)
+       (check-equal? (a-plus-abs-b -4 3)  -1)
+       (check-equal? (a-plus-abs-b 2 -3)  5)
+       (check-equal? (a-plus-abs-b -7 -7) 0)
+       (check-equal? (a-plus-abs-b -9 9)  0)
+       (check-equal? (a-plus-abs-b 8 -1)  9)))
+
+;; Exercicio 06
+;; Numero, Numero -> Numero
+;; Funcao responsavel por retornar o maior valor.
+;; Exemplos:
+;;     (maior-valor-2 0 0)   -> 0
+;;     (maior-valor-2 -2 0)  -> 0
+;;     (maior-valor-2 0 -4)  -> 0
+;;     (maior-valor-2 1 -3)  -> 1
+;;     (maior-valor-2 0 5)   -> 5
+;;     (maior-valor-2 -4 -3) -> -3
+(define (maior-valor-2 a b)
+  (if (> a b) a b))
+
+;; Funcao responsavel por definir testes para a funcao maior-valor.
+(define maior-valor-2-tests
+   (test-suite "maior-valor-2 tests"
+       (check-equal? (maior-valor-2 0 0)   0)
+       (check-equal? (maior-valor-2 -2 0)  0)
+       (check-equal? (maior-valor-2 0 -4)  0)
+       (check-equal? (maior-valor-2 1 -3)  1)
+       (check-equal? (maior-valor-2 0 5)   5)
+       (check-equal? (maior-valor-2 -4 -3) -3)))
+
+;; Exercicio 07
+;; Numero, Numero, Numero -> Numero
+;; Funcao responsavel por retornar o maior valor.
+;; Exemplos:
+;;     (maior-valor-3 0 0 0)    -> 0
+;;     (maior-valor-3 -2 0 -3)  -> 0
+;;     (maior-valor-3 0 1 2)    -> 2
+;;     (maior-valor-3 1 -3 0)   -> 1
+;;     (maior-valor-3 0 5 -5)   -> 5
+;;     (maior-valor-3 -4 -3 -2) -> -2
+(define (maior-valor-3 a b c)
+  (if (> a b)
+      (maior-valor-2 a c)
+      (maior-valor-2 b c)))
+
+
+;; Funcao responsavel por definir testes para a funcao maior-valor-3.
+(define maior-valor-3-tests
+   (test-suite "maior-valor-3 tests"
+       (check-equal? (maior-valor-3 0 0 0)    0)
+       (check-equal? (maior-valor-3 -2 0 -3)  0)
+       (check-equal? (maior-valor-3 0 1 2)    2)
+       (check-equal? (maior-valor-3 1 -3 0)   1)
+       (check-equal? (maior-valor-3 0 5 -5)   5)
+       (check-equal? (maior-valor-3 -4 -3 -2) -2)))
+
+
+;; Exercicio 08
+;; Numero, Numero -> Numero
+;; Funcao responsavel por retornar a distancia de uma x y para a origem (0, 0).
+;; Exemplos:
+;;     (dist-origem 0 0)  -> 0
+;;     (dist-origem 1 0)  -> 1
+;;     (dist-origem 0 3)  -> 3
+;;     (dist-origem 4 -2) -> 4.47213595499958
+(define (dist-origem x y)
+  (sqrt (+ (* x x)
+           (* y y))))
+
+;; Funcao responsavel por definir testes para a funcao dist-origem.
+(define dist-origem-tests
+   (test-suite "dist-origem tests"
+       (check-equal? (dist-origem 0 0)  0)
+       (check-equal? (dist-origem 1 0)  1)
+       (check-equal? (dist-origem 0 3)  3)
+       (check-equal? (dist-origem 4 -2) 4.47213595499958)))
+
+;; Exercicio 09
+;; Numero, Numero, Numero -> String
+;; Funcao responsavel por retornar se o triangulo e Equilatero (3 lados iguais), Isosceles (2 lados iguais) ou Escaleno (3 lados diferentes).
+;; Exemplos:
+;;     (tipo-triangulo 1 1 1) -> "Equilatero"
+;;     (tipo-triangulo 1 2 1) -> "Isosceles"
+;;     (tipo-triangulo 1 2 3) -> "Escaleno"
+(define (tipo-triangulo a b c)
+  (cond
+    [(= a b) (if (= a c) "Equilatero" "Isosceles")]
+    [else    (cond
+               [(= a c) "Isosceles"]
+               [(= b c) "Isosceles"]
+               [else    "Escaleno"])]))
+
+;; Funcao responsavel por definir testes para a funcao tipo-triangulo.
+(define tipo-triangulo-tests
+   (test-suite "tipo-triangulo tests"
+       (check-equal? (tipo-triangulo 2 2 2) "Equilatero")
+       (check-equal? (tipo-triangulo 1 2 2) "Isosceles")
+       (check-equal? (tipo-triangulo 2 3 2) "Isosceles")
+       (check-equal? (tipo-triangulo 5 5 8) "Isosceles")
+       (check-equal? (tipo-triangulo 4 3 2) "Escaleno")))
+
+;; Exercicio 10
+;; Real, Real -> Real
+;; Funcao responsavel por retornar o IMC.
+;; Exemplos:
+;;     (imc 80 1.8)  -> 24.691358024691358
+;;     (imc 85 1.6)  -> 33.20312499999999
+;;     (imc 60 1.95) -> 15.779092702169626
+(define (imc peso altura)
+  (/ peso (* altura altura)))
+
+;; Funcao responsavel por definir testes para a funcao imc.
+(define imc-tests
+   (test-suite "imc tests"
+       (check-equal? (imc 80 1.8)  24.691358024691358)
+       (check-equal? (imc 85 1.6)  33.20312499999999)
+       (check-equal? (imc 60 1.95) 15.779092702169626)))
+
+
+;; Teste -> Void
+;; Funcao responsavel por executar o conjunto de testes definidos.
+(define (executa-testes . testes)
+  (run-tests (test-suite "Todos os testes" testes))
+  (void))
+
+;; Funcao responsavel por executar os testes.
+(executa-testes exercicio_02?-tests
+                a-plus-abs-b-tests
+                maior-valor-2-tests
+                maior-valor-3-tests
+                dist-origem
+                tipo-triangulo
+                imc) 
