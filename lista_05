@@ -1,0 +1,249 @@
+;; Lista de Exercicios 05
+
+#lang racket
+
+(require rackunit)
+(require rackunit/text-ui)
+
+;; Exercicio 01.a
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural e Maior que outro Natural.
+(define (maior? a b)
+  (cond
+    [(zero? a) #f]
+    [(zero? b) #t]
+    [else (maior? (sub1 a) (sub1 b))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao maior?.
+(define maior?-tests
+  (test-suite "maior? tests"
+   (check-equal? (maior? 0 0) #f)
+   (check-equal? (maior? 0 1) #f)
+   (check-equal? (maior? 1 0) #t)
+   (check-equal? (maior? 2 2) #f)
+   (check-equal? (maior? 4 3) #t)
+   (check-equal? (maior? 3 4) #f)))
+
+;; Exercicio 01.b
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural e Maior ou Igual a outro Natural.
+(define (maior-ou-igual? a b)
+  (cond
+    [(zero? b) #t]
+    [(zero? a) #f]
+    [else (maior-ou-igual? (sub1 a) (sub1 b))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao maior-ou-igual?.
+(define maior-ou-igual?-tests
+  (test-suite "maior-ou-igual? tests"
+   (check-equal? (maior-ou-igual? 0 0) #t)
+   (check-equal? (maior-ou-igual? 1 0) #t)
+   (check-equal? (maior-ou-igual? 0 1) #f)
+   (check-equal? (maior-ou-igual? 2 3) #f)
+   (check-equal? (maior-ou-igual? 4 4) #t)
+   (check-equal? (maior-ou-igual? 5 3) #t)))
+
+;; Exercicio 01.c
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural e Menor a outro Natural.
+(define (menor? a b)
+  (cond    
+    [(zero? b) #f]
+    [(zero? a) #t]
+    [else (menor? (sub1 a) (sub1 b))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao menor?.
+(define menor?-tests
+  (test-suite "menor? tests"
+   (check-equal? (menor? 0 0) #f)
+   (check-equal? (menor? 1 0) #f)
+   (check-equal? (menor? 0 1) #t)
+   (check-equal? (menor? 2 2) #f)
+   (check-equal? (menor? 3 5) #t)
+   (check-equal? (menor? 7 2) #f)))
+
+;; Exercicio 01.d
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural e Menor ou Igual a outro Natural.
+(define (menor-ou-igual? a b)
+  (cond
+    [(zero? a) #t]
+    [(zero? b) #f]
+    [else (menor-ou-igual? (sub1 a) (sub1 b))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao menor-ou-igual?.
+(define menor-ou-igual?-tests
+  (test-suite "menor-ou-igual? tests"
+   (check-equal? (menor-ou-igual? 0 0) #t)
+   (check-equal? (menor-ou-igual? 1 0) #f)
+   (check-equal? (menor-ou-igual? 0 1) #t)
+   (check-equal? (menor-ou-igual? 3 3) #t)
+   (check-equal? (menor-ou-igual? 4 2) #f)
+   (check-equal? (menor-ou-igual? 4 8) #t)))
+
+;; Exercicio 01.e
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural for Igual a outro Natural.
+(define (igual? a b)
+  (and (menor-ou-igual? a b)
+       (maior-ou-igual? a b)))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao igual?.
+(define igual?-tests
+  (test-suite "igual? tests"
+   (check-equal? (igual? 0 0) #t)
+   (check-equal? (igual? 1 0) #f)
+   (check-equal? (igual? 0 2) #f)
+   (check-equal? (igual? 3 3) #t)))
+
+;; Exercicio 02
+;; Lista Plana, Numero -> Lista Plana
+;; Funcao responsavel por retornar os n primeiro Elementos de uma Lista Plana.
+(define (take lista n)
+  (cond
+    [(zero?  n)     empty]
+    [(empty? lista) empty]
+    [else (cons (first lista) (take (rest lista) (sub1 n)))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao take.
+(define take-tests
+  (test-suite "take tests"
+   (check-equal? (take  empty 1)        empty)
+   (check-equal? (take (list 0) 0)      empty)
+   (check-equal? (take (list 0 1 2) 1) (list 0))
+   (check-equal? (take (list 0 1 2) 3) (list 0 1 2))
+   (check-equal? (take (list 0 1 2) 4) (list 0 1 2))
+   (check-equal? (take (list 0 1) 2)   (list 0 1))))
+
+;; Exercicio 03
+;; Lista Plana, Numero -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana sem os n primeiros Elementos da Lista Plana.
+(define (drop lista n)
+  (cond
+    [(empty? lista) empty]
+    [(> n 0)       (drop (rest lista) (sub1 n))]
+    [else          (cons (first lista)
+                         (drop (rest lista) (sub1 n)))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao drop.
+(define drop-tests
+  (test-suite "drop tests"
+   (check-equal? (drop  empty       1)  empty)
+   (check-equal? (drop (list 0)     0) (list 0))
+   (check-equal? (drop (list 0 1)   0) (list 0 1))
+   (check-equal? (drop (list 0 1 2) 1) (list 1 2))
+   (check-equal? (drop (list 0 1 2) 2) (list 2))
+   (check-equal? (drop (list 0 1 2) 3) (list))
+   (check-equal? (drop (list 0 1 2) 4) (list))))
+
+;; Exercicio 04
+;; Lista Plana, Numero -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana removendo um Elemento em uma Posicao n de uma Lista Plana.
+(define (remove-at lista n)
+  (cond
+    [(empty? lista) empty]
+    [(zero?  n)    (rest lista)]
+    [else (cons (first lista)
+                (remove-at (rest lista) (sub1 n)))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao remove-at.
+(define remove-at-tests
+  (test-suite "remove-at tests"
+   (check-equal? (remove-at  empty       1)   empty)
+   (check-equal? (remove-at (list 0)     0)   empty)
+   (check-equal? (remove-at (list 0 1)   1)  (list 0))
+   (check-equal? (remove-at (list 1 2 3) 0)  (list 2 3))
+   (check-equal? (remove-at (list 1 2 3) 1)  (list 1 3))
+   (check-equal? (remove-at (list 1 2 3) 2)  (list 1 2))
+   (check-equal? (remove-at (list 1 2 3) 3)  (list 1 2 3))
+   (check-equal? (remove-at (list 1 2 3) 4)  (list 1 2 3))))
+
+;; Exercicio 05
+;; Lista Plana, Numero, Numero -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana adicionando um Elemento n em uma Posicao index.
+(define (insert-at lista n index)
+  (cond
+    [(empty? lista) (list n)]
+    [(zero?  index) (cons n
+                          lista)]
+    [else           (cons (first lista)
+                          (insert-at (rest lista) n (sub1 index)))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao insert-at.
+(define insert-at-tests
+  (test-suite "insert-at tests"
+   (check-equal? (insert-at  empty       1 0) (list 1))
+   (check-equal? (insert-at  empty       8 1) (list 8))
+   (check-equal? (insert-at  empty       9 3) (list 9))
+   (check-equal? (insert-at  (list 1)    2 0) (list 2 1))
+   (check-equal? (insert-at  (list 1)    7 1) (list 1 7))
+   (check-equal? (insert-at  (list 1)    8 3) (list 1 8))
+   (check-equal? (insert-at  (list 0 1)  2 0) (list 2 0 1))
+   (check-equal? (insert-at  (list 0 1)  2 1) (list 0 2 1))
+   (check-equal? (insert-at  (list 0 1)  2 2) (list 0 1 2))
+   (check-equal? (insert-at  (list 0 1)  2 3) (list 0 1 2))
+   (check-equal? (insert-at  (list 0 1)  2 0) (list 2 0 1))))
+
+;; Exercicio 06
+;; Lista Plana, Numero, Numero -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana com os elementos em um Intervalo [inicio, ... ,fim] de uma Lista Plana.
+(define (sub-list lista inicio fim)
+  (cond
+    [(empty? lista)  empty]
+    [(< fim inicio)  empty]
+    [(zero? fim)    (list (first lista))]
+    [(< inicio 0)   (sub-list (rest lista) (sub1 inicio) fim)]
+    [else (cons (first lista)
+                (sub-list (rest lista) (sub1 inicio) (sub1 fim)))]))
+
+;; Exercicio 08
+;; Lista Plana, Lista Plana -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana com os Elementos da Lista Plana 1 e da Lista Plana 2.
+(define (append lista_1 lista_2)
+  (cond
+    [(empty? lista_1) lista_2]
+    [(empty? lista_2) lista_1]
+    [else (cons (first lista_1)
+                (append (rest lista_1) lista_2))]))
+
+;; Funcao responsavel por definir os Testes Unitarios da Funcao append.
+(define append-tests
+  (test-suite "append tests"
+   (check-equal? (append  empty       empty)      empty)
+   (check-equal? (append  empty      (list 2))   (list 2))
+   (check-equal? (append  empty      (list 2 3)) (list 2 3))
+   (check-equal? (append  (list 4)    empty)     (list 4))
+   (check-equal? (append  (list 4 5)  empty)     (list 4 5))
+   (check-equal? (append  (list 0)   (list 1))   (list 0 1))
+   (check-equal? (append  (list 0 1) (list 2))   (list 0 1 2))
+   (check-equal? (append  (list 1)   (list 2 3)) (list 1 2 3))
+   (check-equal? (append  (list 0 1) (list 2 3)) (list 0 1 2 3))))
+
+;; Exercicio 09
+;; Lista Plana, Lista Plana -> Lista Plana
+;; Funcao responsavel por retornar uma Lista Plana concatenando os elementos ordenados das Listas Planas.
+(define (merge lista_1 lista_2)
+  (cond
+    [(empty? lista_1) lista_2]
+    [(empty? lista_2) lista_1]
+    ))
+    
+
+;; Teste ... -> Void
+;; Executa um conjunto de Testes.
+(define (executa-testes . testes)
+  (run-tests (test-suite "Todos os testes" testes))
+  (void))
+
+;; Chama a função para executar os testes.
+(executa-testes maior?-tests
+                maior-ou-igual?-tests
+                menor?-tests
+                menor-ou-igual?-tests
+                igual?-tests
+                take-tests
+                drop-tests
+                remove-at-tests
+                insert-at-tests
+                append-tests)
+
