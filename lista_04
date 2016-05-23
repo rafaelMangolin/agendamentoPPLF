@@ -1,0 +1,241 @@
+;; Universidade Estadual de Maringa
+;; Departamento de Informatica
+;; Bacharelado em Informatica
+;; Paradigma de Prog Logica e Funcional
+;; Lista de Exercicios 04
+;; Aluno: Leandro Flores
+
+#lang racket
+
+(require rackunit)
+(require rackunit/text-ui)
+
+;; Exercicio 01
+;; Natural -> Natural
+;; Funcao responsavel por retornar o Fatorial de um Natural.
+(define (fatorial n)
+  (cond
+    [(zero? n) 1]
+    [else (* n (fatorial (sub1 n)))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao fatorial.
+(define fatorial-tests
+  (test-suite "fatorial tests"
+   (check-equal? (fatorial 0) 1)
+   (check-equal? (fatorial 1) 1)
+   (check-equal? (fatorial 2) 2)
+   (check-equal? (fatorial 3) 6)
+   (check-equal? (fatorial 4) 24)))
+
+
+;; Exercicio 02.a
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar a Soma de dois Naturais.
+(define (soma n1 n2)
+  (cond
+    [(zero? n1) n2]
+    [(zero? n2) n1]
+    [else (soma (add1 n1) (sub1 n2))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao soma.
+(define soma-tests
+  (test-suite "soma tests"
+   (check-equal? (soma 0 0) 0)
+   (check-equal? (soma 2 0) 2)
+   (check-equal? (soma 0 3) 3)
+   (check-equal? (soma 1 4) 5)
+   (check-equal? (soma 7 1) 8)
+   (check-equal? (soma 3 4) 7)
+   (check-equal? (soma 5 2) 7)))
+
+;; Exercicio 02.b
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar a Subtracao de dois Naturais.
+(define (sub n1 n2)
+  (cond
+    [(zero? n1) n2]
+    [(zero? n2) n1]
+    [else (sub (sub1 n1) (sub1 n2))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao sub.
+(define sub-tests
+  (test-suite "sub tests"
+   (check-equal? (sub 0 0) 0)
+   (check-equal? (sub 1 0) 1)
+   (check-equal? (sub 0 4) 4)
+   (check-equal? (sub 2 1) 1)
+   (check-equal? (sub 1 3) 2)
+   (check-equal? (sub 4 2) 2)))
+
+
+;; Exercicio 02.c
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar o Produto de dois Naturais.
+(define (mult n1 n2)
+  (cond
+    [(zero? n1) 0]
+    [(zero? n2) 0]
+    [else (soma n1 (mult n1 (sub1 n2)))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao mult.
+(define mult-tests
+  (test-suite "mult tests"
+   (check-equal? (mult 0 0)  0)
+   (check-equal? (mult 0 1)  0)
+   (check-equal? (mult 3 0)  0)
+   (check-equal? (mult 3 1)  3)
+   (check-equal? (mult 1 7)  7)
+   (check-equal? (mult 2 3)  6)
+   (check-equal? (mult 4 3) 12)))
+
+;; Exercicio 03.a
+;; Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural for par, e #f caso contrario.
+(define (par? n)
+  (cond
+    [(zero? n) #t]
+    [else (impar? (sub1 n))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao par?.
+(define par?-tests
+  (test-suite "par? tests"
+   (check-equal? (par? 0) #t)
+   (check-equal? (par? 1) #f)
+   (check-equal? (par? 2) #t)
+   (check-equal? (par? 3) #f)
+   (check-equal? (par? 4) #t)))
+
+;; Exercicio 03.b
+;; Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural for impar, e #f caso contrario.
+(define (impar? n)
+  (cond
+    [(zero? n) #f]
+    [else (par? (sub1 n))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao impar?.
+(define impar?-tests
+  (test-suite "impar? tests"
+   (check-equal? (impar? 0) #f)
+   (check-equal? (impar? 1) #t)
+   (check-equal? (impar? 2) #f)
+   (check-equal? (impar? 3) #t)
+   (check-equal? (impar? 4) #f)))
+
+;; Exercicio 04 - Auxiliar 1
+;; Natural, Natural -> Boolean
+;; Funcao responsavel por retornar se um Natural e Divisivel por outro Natural.
+;; Obs: Utiliza a Funcao remainder.
+(define (divisivel? n1 n2)
+  (= (remainder n1 n2) 0))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao divisivel?.
+(define divisivel?-tests
+  (test-suite "divisivel? tests"
+   (check-equal? (divisivel? 0 2) #t)
+   (check-equal? (divisivel? 1 2) #f)
+   (check-equal? (divisivel? 3 3) #t)
+   (check-equal? (divisivel? 5 4) #f)))
+
+;; Exercicio 04 - Auxiliar 2
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar a Soma dos Numeros Divisiveis de um Natural (n1) entre [1, n2].
+;; Obs: Desconsidera o proprio natural.
+(define (soma-divisores-naturais n1 n2)
+  (cond
+    [(zero? n1) 0]
+    [(zero? n2) 0]
+    [(divisivel? n1 n2) (+ n2 (soma-divisores-naturais n1 (sub1 n2)))]
+    [else (soma-divisores-naturais n1 (sub1 n2))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao soma-divisores-naturais.
+(define soma-divisores-naturais-tests
+  (test-suite "soma-divisores-naturais tests"
+   (check-equal? (soma-divisores-naturais 0 0)  0)
+   (check-equal? (soma-divisores-naturais 0 1)  0)   
+   (check-equal? (soma-divisores-naturais 1 1)  1)
+   (check-equal? (soma-divisores-naturais 1 4)  1)
+   (check-equal? (soma-divisores-naturais 2 3)  3)
+   (check-equal? (soma-divisores-naturais 4 4)  7)
+   (check-equal? (soma-divisores-naturais 4 3)  3)))
+
+
+;; Exercicio 04
+;; Natural -> Natural
+;; Funcao responsavel por retornar #t se o Numero e Inteiro Perfeito, e #f caso contrario.
+;; Numero Inteiro Perfeito: Soma de seus Divisores e Igual ao Numero.
+(define (perfeito? n)
+  (= n (soma-divisores-naturais n (sub1 n))))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao perfeito?.
+(define perfeito?-tests
+  (test-suite "perfeito? tests"
+   (check-equal? (perfeito? 1) #f)
+   (check-equal? (perfeito? 2) #f) ; 1 + 2 <> 2
+   (check-equal? (perfeito? 3) #f) ; 1 <> 3
+   (check-equal? (perfeito? 4) #f) ; 1 + 2 <> 4
+   (check-equal? (perfeito? 5) #f) ; 1 <> 5
+   (check-equal? (perfeito? 6) #t))) ; 1 + 2 + 3 = 6
+   
+;; Exercicio 05 - Auxiliar 1
+;; Natural -> Boolean
+;; Funcao responsavel por retornar #t se um Natural e primo, e #f caso contrario.
+;; Numero Primo: Numero divisivel apenas por 1 e ele mesmo.
+(define (primo? n)
+  (cond
+    [(zero? n)    #f]
+    [(equal? 1 n) #t]
+    [else (= 1 (soma-divisores-naturais n (sub1 n)))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao primo?.
+(define primo?-tests
+  (test-suite "primo? tests"
+   (check-equal? (primo? 0) #f)
+   (check-equal? (primo? 1) #t)
+   (check-equal? (primo? 2) #t)
+   (check-equal? (primo? 3) #t)
+   (check-equal? (primo? 4) #f)
+   (check-equal? (primo? 5) #t)
+   (check-equal? (primo? 6) #f)
+   (check-equal? (primo? 7) #t)
+   (check-equal? (primo? 8) #f)
+   (check-equal? (primo? 9) #f)))
+
+;; Exercicio 05
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar a Quantidade de Naturais Primos entre um Intervalo (inicio - fim).
+(define (cont-primos inicio fim)
+  (cond
+    [(< fim inicio) 0]
+    [(primo? fim)   (+ 1 (cont-primos inicio (sub1 fim)))]
+    [else                (cont-primos inicio (sub1 fim))]))
+
+;; Funcao responsavel por definir Testes Unitarios para a funcao cont-primo.
+(define cont-primo-tests
+  (test-suite "cont-primo tests"
+   (check-equal? (cont-primos 0 0) 0)
+   (check-equal? (cont-primos 2 1) 0)
+   (check-equal? (cont-primos 1 2) 2)   ; (1, 2)
+   (check-equal? (cont-primos 1 3) 3)   ; (1, 2, 3)
+   (check-equal? (cont-primos 2 3) 2)   ; (2, 3)
+   (check-equal? (cont-primos 3 8) 3))) ; (3, 5, 7)
+
+
+;; Teste ... -> Void
+;; Executa um conjunto de testes.
+(define (executa-testes . testes)
+  (run-tests (test-suite "Todos os testes" testes))
+  (void))
+
+;; Chama a função para executar os testes.
+(executa-testes fatorial-tests
+                soma-tests
+                sub-tests
+                mult-tests
+                par?-tests
+                impar?-tests
+                divisivel?-tests
+                soma-divisores-naturais-tests
+                perfeito?-tests
+                primo?-tests
+                cont-primo-tests)
