@@ -81,7 +81,41 @@
 ;; Intervalo, Intervalo -> Intervalo
 ;; Calcula a interseção entre os intervalos a e b
 (define (intervalo-intersecao a b)
-  (error "Não implementado"))
+  (cond
+    [(intervalo-vazio? a) intervalo-vazio]
+    [(intervalo-vazio? b) intervalo-vazio]
+    [(equal? a b) a]
+    [(intervalo-valido? (intervalo (maior-horario (intervalo-inicio a) (intervalo-inicio b))
+                                   (menor-horario (intervalo-fim a) (intervalo-fim b))))
+     (intervalo (maior-horario (intervalo-inicio a) (intervalo-inicio b))
+                                   (menor-horario (intervalo-fim a) (intervalo-fim b)))]
+    [else intervalo-vazio]
+    ))
+
+;; Horario, Horario -> Horario
+;; Funcao responsavel por retornar o Maior Horario.
+(define (maior-horario h1 h2)
+  (cond
+    [(> (horario-h h1) (horario-h h2)) h1]
+    [(> (horario-h h2) (horario-h h1)) h2]
+    [(> (horario-m h1) (horario-m h2)) h1]
+    [else h2]))
+
+;; Horario, Horario -> Horario
+;; Funcao responsavel por retornar o Menor Horario.
+(define (menor-horario h1 h2)
+  (cond
+    [(< (horario-h h1) (horario-h h2)) h1]
+    [(< (horario-h h2) (horario-h h1)) h2]
+    [(< (horario-m h1) (horario-m h2)) h1]
+    [else h2]))
+
+;; Intervalo -> Boolean
+;; Funcao responsavel por retornar #t se um Intervalo e valido, e #f caso contrario.
+;; Considera-se como intervalo valido caso o Segundo Horario for maior que o Primeiro Horario.
+(define (intervalo-valido? inter)
+  (equal? (intervalo-fim inter) (maior-horario (intervalo-fim inter) (intervalo-inicio inter))))
+
 
 ;; list Intervalo, list Intervalo -> list Intervalo
 ;; Encontra a interseção dos intervalos de dispo-a e dispo-b.
@@ -181,4 +215,8 @@
     [else (cons (dia-convertido-em-lista (string-split linha " ")) (arquivo-convertido-em-lista ponteiro (read-line ponteiro)))]))
 
 (define linha (read-line in))
-(arquivo-convertido-em-lista in linha)
+(define a (arquivo-convertido-em-lista in linha))
+(define i1 (first (rest (first a))))
+(define i2 (first (rest (first (rest (rest a))))))
+a
+i2
