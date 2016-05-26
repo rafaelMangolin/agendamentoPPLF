@@ -120,8 +120,21 @@
 ;; list Intervalo, list Intervalo -> list Intervalo
 ;; Encontra a interseção dos intervalos de dispo-a e dispo-b.
 (define (encontrar-dispo-em-comum dispo-a dispo-b)
-  (error "Não implementado"))
+  (cond
+    [(empty? dispo-a) empty]
+    [(empty? dispo-b) empty]
+    [else (append (encontra-intersecao-intervalo-lista (first dispo-a) dispo-b) (encontrar-dispo-em-comum (rest dispo-a) dispo-b))]
+     ))
 
+;; Intervalo , list Intervalo -> list
+;; Encontra as intercecoes do intervalo com a lista
+(define (encontra-intersecao-intervalo-lista inter dispo)
+  (cond
+    [(empty? dispo) empty]
+    [(intervalo-vazio? inter) empty]
+    [(intervalo-vazio? (intervalo-intersecao inter (first dispo))) (encontra-intersecao-intervalo-lista inter (rest dispo))]
+    [else (cons (intervalo-intersecao inter (first dispo)) (encontra-intersecao-intervalo-lista inter (rest dispo)))]
+   ))
 ;; Horário, list dispo-semana -> dispo-semana
 ;; Esta função encontra os intervalos disponíveis para cada dia da semana que
 ;; sejam maiores que tempo e que sejam comuns a todas as disponibilidades
@@ -216,7 +229,14 @@
 
 (define linha (read-line in))
 (define a (arquivo-convertido-em-lista in linha))
+
+(define l1 (rest (first a)))
+(define l2 (rest (first (rest a))))
+
 (define i1 (first (rest (first a))))
 (define i2 (first (rest (first (rest (rest a))))))
-a
-i2
+
+
+
+l1
+l2
