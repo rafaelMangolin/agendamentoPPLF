@@ -158,6 +158,78 @@
 (define (encontrar-dispo-semana-em-comum tempo dispos)
   (error "Não implementado"))
 
+
+(define (dia-maior? a b)
+  (cond
+    []))
+
+(define (encontra-inter-entre-dispo a b)
+  (
+   cond
+    [(empty? a) empty]
+    [(empty? b) empty]
+    [(equal? (first (first a)) (first (first b))) empty ]
+    )
+
+;; Horario -> Natural
+;; Funcao responsavel por retornar um Horario em Minutos.
+;; Exemplos:
+;;     (get-minutos (horario 0 0))   ->   0 
+;;     (get-minutos (horario 0 43))  ->  43
+;;     (get-minutos (horario 1 43))  -> 103
+;;     (get-minutos (horario 10 30)) -> 630
+(define (get-minutos h1)
+  (+ (* (horario-h h1) 60)
+     (horario-m h1)))
+
+;; Intervalo -> Natural
+;; Funcao responsavel por retornar a diferenca (em minutos) do Horario Inicial para o Horario Final.
+;; Exemplos:
+;;     (diferenca-horas (intervalo (horario 15 10) (horario 15 30))) ->  20
+;;     (diferenca-horas (intervalo (horario 15 30) (horario 15 30))) ->   0
+;;     (diferenca-horas (intervalo (horario 15 40) (horario 15 30))) -> -10
+;;     (diferenca-horas (intervalo (horario 15 10) (horario 16 30))) ->  80
+;;     (diferenca-horas (intervalo (horario 15 10) (horario 19 10))) -> 240
+(define (diferenca-horas inter)
+  (- (get-minutos (intervalo-fim    inter))
+     (get-minutos (intervalo-inicio inter))))
+
+;; Natural -> Horario
+;; Funcao responsavel por retornar um Horario pelo numero de minutos.
+;; Exemplos:
+;;     (converte-horario  0)  -> void
+;;     (converte-horario 10)  -> (horario 0 10)
+;;     (converte-horario 60)  -> (horario 1 0)
+;;     (converte-horario 130) -> (horario 2 10)
+(define (converte-horario n)
+  (cond
+    [(<= n 0) void]
+    [else (horario (divisao-inteira n 60) (remainder n 60))]))
+
+;; Natural, Natural -> Natural
+;; Funcao responsavel por retornar a parte inteira da Divisao.
+;; Exemplos:
+;;     (divisao-inteira 2 0)    -> 0
+;;     (divisao-inteira 2 1)    -> 2
+;;     (divisao-inteira 2 3)    -> 0
+;;     (divisao-inteira 100 40) -> 2
+(define (divisao-inteira n d)
+  (cond
+    [(zero? d) 0]
+    [(< n d) 0]
+    [else (+ 1 (divisao-inteira (- n d) d))]))
+
+;; Horario -> Boolean
+;; Funcao responsavel por retornar true se o horario e vazio, e false caso contrario.
+;; Exemplos:
+;;     (horario-vazio? (horario 0 0)) -> #t
+;;     (horario-vazio? (horario 0 1)) -> #f
+(define (horario-vazio? horario)
+  (cond
+    [(void? horario) #t]
+    [(> (horario-h horario) 0) #f]
+    [else (= (horario-m horario) 0)]))
+
 ;; list string -> void
 ;; Esta é a função principal. Esta função é chamada a partir do arquivo
 ;; reuni-main.rkt
@@ -216,7 +288,7 @@
 (define (dia-convertido-em-lista dia)
   (cond
     [(empty? dia) empty]
-    [(= 3 (string-length (first dia))) (cons (first dia) (dia-convertido-em-lista (rest dia)))]
+    [(= 3 (string-length (first dia))) (cons (first dia) (cons (dia-convertido-em-lista (rest dia)) empty))]
     [else (cons (string-convertida-em-intervalo (first dia)) (dia-convertido-em-lista (rest dia)))]
   )
 )
@@ -238,5 +310,4 @@
 
 
 
-l1
-l2
+a
