@@ -159,17 +159,31 @@
   (error "Não implementado"))
 
 
-(define (dia-maior? a b)
+;; String, String -> Boolean
+;; Verifica se o dia de uma string é maior que outro
+(define (dia-a-maior-que-b? a b)
   (cond
-    []))
+    [(equal? a b) #f]
+    [(equal? a "seg") #f]
+    [(equal? b "seg") #t]
+    [(equal? a "sex") #t]
+    [(equal? b "sex") #f]
+    [(equal? a "ter") #f]
+    [(equal? b "ter") #t]
+    [(equal? a "qua") #f]
+    [(equal? b "qua") #t]
+    [(equal? a "qui") #f]
+    [else #t]))
 
 (define (encontra-inter-entre-dispo a b)
-  (
+ (
    cond
     [(empty? a) empty]
     [(empty? b) empty]
-    [(equal? (first (first a)) (first (first b))) empty ]
-    )
+    [(equal? (first (first a)) (first (first b))) (append (cons (cons (first (first a)) (cons (encontrar-dispo-em-comum (first(rest (first a))) (first (rest (first b))) ) empty)) empty) (encontra-inter-entre-dispo (rest a) (rest b)))]
+    [(dia-a-maior-que-b? (first (first a)) (first (first b))) (encontra-inter-entre-dispo a (rest b))]
+    [else (encontra-inter-entre-dispo (rest a) b)]
+  ))
 
 ;; Horario -> Natural
 ;; Funcao responsavel por retornar um Horario em Minutos.
@@ -253,6 +267,7 @@
   (error "Não implementada"))
 
 (define in (open-input-file "../testes/b"))
+(define inC (open-input-file "../testes/c"))
 ;(read-line in)
 ;(define linha (read-line in))
 ;(define  arrL (string-split	linha " "))
@@ -300,7 +315,9 @@
     [else (cons (dia-convertido-em-lista (string-split linha " ")) (arquivo-convertido-em-lista ponteiro (read-line ponteiro)))]))
 
 (define linha (read-line in))
+(define linhaC (read-line inC))
 (define a (arquivo-convertido-em-lista in linha))
+(define b (arquivo-convertido-em-lista inC linhaC))
 
 (define l1 (rest (first a)))
 (define l2 (rest (first (rest a))))
@@ -310,4 +327,6 @@
 
 
 
-a
+;a
+;b
+(encontra-inter-entre-dispo a b)
