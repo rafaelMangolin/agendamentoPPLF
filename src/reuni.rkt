@@ -156,7 +156,24 @@
 ;; semanais, o exemplo acima refere-se a apenas uma disponibilidade semanal.
 ;; Veja os testes de unidade para exemplos de entrada e saída desta função
 (define (encontrar-dispo-semana-em-comum tempo dispos)
-  (error "Não implementado"))
+  (filter dia-com-dispo? (retorna-dispo-valida (foldl redux-list-dispo (first dispos) (rest dispos)) (get-minutos tempo))))
+
+  (define (dia-com-dispo? dia)
+    (cond
+      [(empty? (rest dia)) #f]
+      [else #t]
+    ))
+
+
+  (define (intervalo-valido list tempo)
+    (cond
+      [(empty? list) empty]
+      [(< (diferenca-horas (first list)) tempo) (intervalo-valido (rest list) tempo)]
+      [else (cons (first list) (intervalo-valido (rest list) tempo))]))
+
+(define (retorna-dispo-valida dispo tempo)
+  (map (λ(dia)
+         (cons (first dia) (intervalo-valido (rest dia) tempo))) dispo))
 
 
 ;; String, String -> Boolean
@@ -175,6 +192,14 @@
     [(equal? a "qui") #f]
     [else #t]))
 
+
+(define (redux-list-dispo base list)
+  (cond
+    [(empty? list) base]
+    [(equal? base void) base]
+    [else (encontra-inter-entre-dispo base list)]
+    )) 
+;; Dispo, Dispo -> Dispo
 (define (encontra-inter-entre-dispo a b)
  (
    cond
@@ -329,4 +354,6 @@
 
 ;a
 ;b
-(encontra-inter-entre-dispo a b)
+;(encontra-inter-entre-dispo a b)
+;(foldl redux-list-dispo a (list b))
+(encontrar-dispo-semana-em-comum (horario 2 0) (list a b))
