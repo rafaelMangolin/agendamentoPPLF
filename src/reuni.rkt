@@ -135,6 +135,7 @@
     [(intervalo-vazio? (intervalo-intersecao inter (first dispo))) (encontra-intersecao-intervalo-lista inter (rest dispo))]
     [else (cons (intervalo-intersecao inter (first dispo)) (encontra-intersecao-intervalo-lista inter (rest dispo)))]
    ))
+
 ;; Horário, list dispo-semana -> dispo-semana
 ;; Esta função encontra os intervalos disponíveis para cada dia da semana que
 ;; sejam maiores que tempo e que sejam comuns a todas as disponibilidades
@@ -160,7 +161,7 @@
 
   (define (dia-com-dispo? dia)
     (cond
-      [(empty? (rest dia)) #f]
+      [(empty? (first (rest dia))) #f]
       [else #t]
     ))
 
@@ -173,7 +174,7 @@
 
 (define (retorna-dispo-valida dispo tempo)
   (map (λ(dia)
-         (cons (first dia) (intervalo-valido (rest dia) tempo))) dispo))
+         (cons (first dia) (cons (intervalo-valido (first(rest dia)) tempo) empty))) dispo))
 
 
 ;; String, String -> Boolean
@@ -181,16 +182,19 @@
 (define (dia-a-maior-que-b? a b)
   (cond
     [(equal? a b) #f]
+    [(equal? a "dom") #f]
+    [(equal? b "dom") #t]
     [(equal? a "seg") #f]
     [(equal? b "seg") #t]
-    [(equal? a "sex") #t]
-    [(equal? b "sex") #f]
     [(equal? a "ter") #f]
     [(equal? b "ter") #t]
     [(equal? a "qua") #f]
     [(equal? b "qua") #t]
     [(equal? a "qui") #f]
-    [else #t]))
+    [(equal? b "qui") #t]
+    [(equal? a "sex") #f]
+    [(equal? b "sex") #t]
+    [else #f]))
 
 
 (define (redux-list-dispo base list)
@@ -289,14 +293,12 @@
 
 
 (define (main args)
-  (error "Não implementada"))
+  (printf (dispo->string (encontrar-dispo-semana-em-comum (string-convertida-em-horario (first args)) (list-arquivo->list-dispo (rest args))))))
 
-(define in (open-input-file "../testes/b"))
-(define inC (open-input-file "../testes/c"))
-;(read-line in)
-;(define linha (read-line in))
-;(define  arrL (string-split	linha " "))
-;(define hr (first (rest arrL)))
+(define (list-arquivo->list-dispo list)
+  (cond
+    [(empty? list) empty]
+    [else (cons (arquivo-convertido-em-lista (open-input-file (first list))) (list-arquivo->list-dispo (rest list)))]))
 
 
 (define (string-convertida-em-horario s)
@@ -334,26 +336,29 @@
 )
 
 
-(define (arquivo-convertido-em-lista ponteiro linha)
+(define (arquivo-convertido-em-lista ponteiro)
+  (let ([linha (read-line ponteiro)])
   (cond
     [(eof-object? linha) empty]
-    [else (cons (dia-convertido-em-lista (string-split linha " ")) (arquivo-convertido-em-lista ponteiro (read-line ponteiro)))]))
+    [else (cons (dia-convertido-em-lista (string-split linha " "))
+                (arquivo-convertido-em-lista ponteiro))])))
 
-(define linha (read-line in))
-(define linhaC (read-line inC))
-(define a (arquivo-convertido-em-lista in linha))
-(define b (arquivo-convertido-em-lista inC linhaC))
+(define (dispo->string dispo)
+ (string-join (map dia->string dispo) ""))
 
-(define l1 (rest (first a)))
-(define l2 (rest (first (rest a))))
+(define (dia->string dia)
+  (string-append (first dia) " " (string-join (map intervalo->string (first (rest dia))) " ") "~%"))
 
-(define i1 (first (rest (first a))))
-(define i2 (first (rest (first (rest (rest a))))))
+(define (intervalo->string intervalo)
+  (string-join (list (horario->string (intervalo-inicio intervalo)) (horario->string (intervalo-fim intervalo))) "-"))
+
+(define (horario->string horario)
+  (string-append (int->string (horario-h horario)) ":" (int->string (horario-m horario))))
+
+(define (int->string num)
+  (cond
+    [(< num 10) (string-append "0" (number->string num))]
+    [else (number->string num)]))
 
 
-
-;a
-;b
-;(encontra-inter-entre-dispo a b)
-;(foldl redux-list-dispo a (list b))
-(encontrar-dispo-semana-em-comum (horario 2 0) (list a b))
+;(main (list "00:01" "../testes/c" "../testes/b" "../testes/livre"))
