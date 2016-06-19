@@ -81,30 +81,33 @@
 ;; Intervalo, Intervalo -> Intervalo
 ;; Calcula a interseção entre os intervalos a e b
 (define (intervalo-intersecao a b)
+  (let* ([maior-inicio (maior-horario (intervalo-inicio a) (intervalo-inicio b))]
+        [menor-fim (menor-horario (intervalo-fim a) (intervalo-fim b))]
+        [intervalo-intersecao (intervalo maior-inicio menor-fim)])
   (cond
     [(intervalo-vazio? a) intervalo-vazio]
     [(intervalo-vazio? b) intervalo-vazio]
     [(equal? a b) a]
-    [(intervalo-valido? (intervalo (maior-horario (intervalo-inicio a) (intervalo-inicio b))
-                                   (menor-horario (intervalo-fim a) (intervalo-fim b))))
-     (intervalo (maior-horario (intervalo-inicio a) (intervalo-inicio b))
-                                   (menor-horario (intervalo-fim a) (intervalo-fim b)))]
-    [else intervalo-vazio]
-    ))
+    [(intervalo-valido? intervalo-intersecao) intervalo-intersecao]
+    [else intervalo-vazio])))
 
 ;; Horario, Horario -> Horario
-;; Funcao responsavel por retornar o Maior Horario.
+;; Funcao responsavel por retornar o horario com o maior termino.
 (define (maior-horario h1 h2)
   (cond
+    [(not (horario? h1)) (error "Deve ser passado uma estrutura horario na 1 posição")]
+    [(not (horario? h2)) (error "Deve ser passado uma estrutura horario na 2 posição")]
     [(> (horario-h h1) (horario-h h2)) h1]
     [(> (horario-h h2) (horario-h h1)) h2]
     [(> (horario-m h1) (horario-m h2)) h1]
     [else h2]))
 
 ;; Horario, Horario -> Horario
-;; Funcao responsavel por retornar o Menor Horario.
+;; Funcao responsavel por retornar o horario com o menor termino.
 (define (menor-horario h1 h2)
   (cond
+    [(not (horario? h1)) (error "Deve ser passado uma estrutura horario na 1 posição")]
+    [(not (horario? h2)) (error "Deve ser passado uma estrutura horario na 2 posição")]
     [(< (horario-h h1) (horario-h h2)) h1]
     [(< (horario-h h2) (horario-h h1)) h2]
     [(< (horario-m h1) (horario-m h2)) h1]
@@ -116,17 +119,17 @@
 (define (intervalo-valido? inter)
   (equal? (intervalo-fim inter) (maior-horario (intervalo-fim inter) (intervalo-inicio inter))))
 
-
 ;; list Intervalo, list Intervalo -> list Intervalo
 ;; Encontra a interseção dos intervalos de dispo-a e dispo-b.
 (define (encontrar-dispo-em-comum dispo-a dispo-b)
   (cond
     [(empty? dispo-a) empty]
     [(empty? dispo-b) empty]
-    [else (append (encontra-intersecao-intervalo-lista (first dispo-a) dispo-b) (encontrar-dispo-em-comum (rest dispo-a) dispo-b))]
-     ))
+    [else (append
+           (encontra-intersecao-intervalo-lista (first dispo-a) dispo-b)
+           (encontrar-dispo-em-comum (rest dispo-a) dispo-b))]))
 
-;; Intervalo , list Intervalo -> list
+;; Intervalo , list Intervalo -> list Intervalo
 ;; Encontra as intercecoes do intervalo com a lista
 (define (encontra-intersecao-intervalo-lista inter dispo)
   (cond
@@ -157,28 +160,30 @@
 ;; semanais, o exemplo acima refere-se a apenas uma disponibilidade semanal.
 ;; Veja os testes de unidade para exemplos de entrada e saída desta função
 (define (encontrar-dispo-semana-em-comum tempo dispos)
-  (filter dia-com-dispo? (retorna-dispo-valida (foldl redux-list-dispo (first dispos) (rest dispos)) (get-minutos tempo))))
+  (filter dia-com-dispo? (dispo-com-intervalos-filtrados-por-tempo (foldl list-dispo->dispo (first dispos) (rest dispos)) (get-minutos tempo))))
 
-  (define (dia-com-dispo? dia)
-    (cond
-      [(empty? (first (rest dia))) #f]
-      [else #t]
-    ))
+;; List (String List) -> Boolean
+;; Verifica se o dia possui intervalos
+(define (dia-com-dispo? dia)
+  (cond
+    [(empty? (first (rest dia))) #f]
+    [else #t]))
 
+;; List intervalo, Number -> List intervalo 
+;(define (intervalo-valido-por-tempo? intervalo)
+ ;   (>= (diferenca-horas (first list)) tempo))
 
-  (define (intervalo-valido list tempo)
-    (cond
-      [(empty? list) empty]
-      [(< (diferenca-horas (first list)) tempo) (intervalo-valido (rest list) tempo)]
-      [else (cons (first list) (intervalo-valido (rest list) tempo))]))
-
-(define (retorna-dispo-valida dispo tempo)
+;; Dispo, Number -> Dispo
+;; Retorna a dispo com apenas os intervalos que sejam validos
+;; ao tempo passado.
+(define (dispo-com-intervalos-filtrados-por-tempo dispo tempo)
   (map (λ(dia)
-         (cons (first dia) (cons (intervalo-valido (first(rest dia)) tempo) empty))) dispo))
-
+         (cons (first dia) (cons
+                (filter (λ(intervalo) (>= (diferenca-horas intervalo) tempo)) (first(rest dia)))
+                empty))) dispo))
 
 ;; String, String -> Boolean
-;; Verifica se o dia de uma string é maior que outro
+;; Verifica se a string do dia a é maior que do b
 (define (dia-a-maior-que-b? a b)
   (cond
     [(equal? a b) #f]
@@ -196,20 +201,25 @@
     [(equal? b "sex") #t]
     [else #f]))
 
-
-(define (redux-list-dispo base list)
-  (cond
-    [(empty? list) base]
-    [(equal? base void) base]
-    [else (encontra-inter-entre-dispo base list)]
-    )) 
 ;; Dispo, Dispo -> Dispo
+;; Funçao usada no fold para fazer a intercesao da lista de dispo
+(define (list-dispo->dispo base atual)
+  (cond
+    [(empty? atual) base]
+    [(equal? base void) base]
+    [else (encontra-inter-entre-dispo base atual)]
+    ))
+
+;; Dispo, Dispo -> Dispo
+;; Função responsavel por montar a intercesao entre dois dispo, 
 (define (encontra-inter-entre-dispo a b)
- (
-   cond
+ (cond
     [(empty? a) empty]
     [(empty? b) empty]
-    [(equal? (first (first a)) (first (first b))) (append (cons (cons (first (first a)) (cons (encontrar-dispo-em-comum (first(rest (first a))) (first (rest (first b))) ) empty)) empty) (encontra-inter-entre-dispo (rest a) (rest b)))]
+    [(equal? (first (first a)) (first (first b)))
+     (append
+      (cons (cons (first (first a)) (cons (encontrar-dispo-em-comum (first(rest (first a))) (first (rest (first b))) ) empty)) empty)
+      (encontra-inter-entre-dispo (rest a) (rest b)))]
     [(dia-a-maior-que-b? (first (first a)) (first (first b))) (encontra-inter-entre-dispo a (rest b))]
     [else (encontra-inter-entre-dispo (rest a) b)]
   ))
@@ -289,76 +299,89 @@
 ;; A saída desta função é a escrita na tela dos intervalos em comum que
 ;; foram encontrados. O formato da saída deve ser o mesmo da disponibilidade
 ;; semanal.
-
-
-
 (define (main args)
-  (printf (dispo->string (encontrar-dispo-semana-em-comum (string-convertida-em-horario (first args)) (list-arquivo->list-dispo (rest args))))))
+  (printf (dispo->string (encontrar-dispo-semana-em-comum (string->horario (first args)) (list-arquivo->list-dispo (rest args))))))
 
+;; List string -> List dispo
+;; Função responsavel por converter uma lista de string (contendo o endereço dos arquivos)
+;; em uma lista de dispos.
 (define (list-arquivo->list-dispo list)
   (cond
     [(empty? list) empty]
-    [else (cons (arquivo-convertido-em-lista (open-input-file (first list))) (list-arquivo->list-dispo (rest list)))]))
+    [else (cons (arquivo->dispo (open-input-file (first list))) (list-arquivo->list-dispo (rest list)))]))
 
-
-(define (string-convertida-em-horario s)
+;; String -> Horario
+;; Função responsavel em converter uma String no formato ("09:30")
+;; para Horario
+(define (string->horario s)
+  (let ([string-list (string-split s ":")])
   (cond
-    [(= 1 (length (string-split s ":"))) #f]
+    [(= 1 (length string-list)) void]
     [else
      (horario
-      (string->number
-       (first (string-split s ":"))
-      )
-      (string->number
-       (first
-        (rest (string-split s ":"))
-       )
-      )
-     )
-    ]
-  )
-)
+      (string->number (first string-list))
+      (string->number (first (rest string-list))))])))
 
+;; String -> Intervalo
+;; Função responsavel em converter string no formato ("10:30-11:20")
+;; para Intervalo
+(define (string->intervalo s)
+  (let ([string-list (string-split s "-")])
+  (intervalo (string->horario (first string-list)) (string->horario (first (rest string-list))))))
 
-(define (string-convertida-em-intervalo s)
-  
-  (intervalo (string-convertida-em-horario (first (string-split s "-")))
-                                                     (string-convertida-em-horario (first (rest (string-split s "-"))))
-                                           ))
-
-
-(define (dia-convertido-em-lista dia)
+;; List String -> Dia
+;; Função responsavel em converter um lista de String em Dia formatado como
+;; '("seg" '((intervalo (horario 1 2) (horario 2 3))))
+(define (list-string->dia dia)
   (cond
     [(empty? dia) empty]
-    [(= 3 (string-length (first dia))) (cons (first dia) (cons (dia-convertido-em-lista (rest dia)) empty))]
-    [else (cons (string-convertida-em-intervalo (first dia)) (dia-convertido-em-lista (rest dia)))]
-  )
-)
+    [(= 3 (string-length (first dia))) (cons (first dia) (cons (list-string->dia (rest dia)) empty))]
+    [else (cons (string->intervalo (first dia)) (list-string->dia (rest dia)))]))
 
-
-(define (arquivo-convertido-em-lista ponteiro)
+;; Ponteiro -> Dispo
+;; Função responsavel em ler o arquivo referenciado no ponteiro com o conteudo:
+;; seg 10:10-11:00
+;; ter 12:10-14:00
+;; e transformalo em dispo
+(define (arquivo->dispo ponteiro)
   (let ([linha (read-line ponteiro)])
   (cond
     [(eof-object? linha) empty]
-    [else (cons (dia-convertido-em-lista (string-split linha " "))
-                (arquivo-convertido-em-lista ponteiro))])))
+    [else (cons (list-string->dia (string-split linha " ")) (arquivo->dispo ponteiro))])))
 
+;; Dispo -> String
+;; Função responsavel por converter um dispo para string no formato
+;; seg 10:10-11:00
+;; ter 12:10-14:00
 (define (dispo->string dispo)
  (string-join (map dia->string dispo) ""))
 
+;; Dia -> String
+;; Função responsavel por converter o dia para string no formato:
+;; seg 10:10-11:00 11:20-16:00
 (define (dia->string dia)
   (string-append (first dia) " " (string-join (map intervalo->string (first (rest dia))) " ") "~%"))
 
+;; Intervalo -> String
+;; Função responsável por converterum intervalo para string no formato:
+;; 10:10-11:00
 (define (intervalo->string intervalo)
   (string-join (list (horario->string (intervalo-inicio intervalo)) (horario->string (intervalo-fim intervalo))) "-"))
 
+;; Horario -> String
+;; Função responsavel por converter um Horario para String no formato:
+;; 10:10
 (define (horario->string horario)
-  (string-append (int->string (horario-h horario)) ":" (int->string (horario-m horario))))
+  (string-append (int->string-min-dois-digitos (horario-h horario)) ":" (int->string-min-dois-digitos (horario-m horario))))
 
-(define (int->string num)
+;; Number -> String
+;; Função responsavel por retornar uma string de um numero com no minimo dois digitos.
+;; Exemplo:
+;; 1 -> "01"
+;; 10 -> "10"
+(define (int->string-min-dois-digitos num)
   (cond
     [(< num 10) (string-append "0" (number->string num))]
     [else (number->string num)]))
 
-
-;(main (list "00:01" "../testes/c" "../testes/b" "../testes/livre"))
+(main (list "00:01" "../testes/c" "../testes/b" "../testes/livre"))
